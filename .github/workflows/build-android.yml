@@ -23,6 +23,11 @@ jobs:
       - name: Build web app
         run: npm run build
 
+      - name: Create Android project
+        run: |
+          rm -rf android
+          npx cap add android
+
       - name: Sync Capacitor
         run: npx cap sync android
 
@@ -34,7 +39,13 @@ jobs:
 
       - name: Build APK
         working-directory: android
-        run: ./gradlew assembleDebug
+        run: |
+          chmod +x gradlew 2>/dev/null || true
+          if [ ! -f gradlew ]; then
+            gradle wrapper
+          fi
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
